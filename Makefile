@@ -1,2 +1,2 @@
 all:
-	c++ someip.cpp -lpcap -ljsoncpp -o someip -std=gnu++20
+	c++ pcap_parse.cpp -lpcap -ljsoncpp -o pcap_parse -std=gnu++20
