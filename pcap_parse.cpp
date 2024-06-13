@@ -27,7 +27,7 @@ bool parse_if_is_someip_packet(SomeipContext *ctx) {
     if (ctx->len < sizeof(SomeipHeader))
         return false;
 
-    struct SomeipHeader *header = ctx->header;
+    struct SomeipHeader *header = &ctx->header;
     memcpy(header, ctx->packet, sizeof(SomeipHeader));
 
     // To host byte order 
@@ -73,7 +73,7 @@ bool parse_if_is_someip_packet(SomeipContext *ctx) {
 
 Json::Value create_someip_json(SomeipContext *ctx) {
     Json::Value json;
-    SomeipHeader *header = ctx->header;
+    SomeipHeader *header = &ctx->header;
     json["hostname"] = g.hostname.data();
     json["timestamp"] = ctx->timestamp;
     json["protocol_type"] = int(ctx->protocol_type);
@@ -121,8 +121,6 @@ Json::Value create_someip_json(SomeipContext *ctx) {
 }
 
 void handle_packet(const byte *packet, uint32_t len, time_t timestamp) {
-    SomeipHeader header;
-
     // Remove Ethernet/IP/UDP headers
     int shift = 0x2e;
     packet += shift;
@@ -133,7 +131,6 @@ void handle_packet(const byte *packet, uint32_t len, time_t timestamp) {
         .packet = packet,
         .len = len,
         .timestamp = timestamp,
-        .header = &header,
         .payload = packet + sizeof(SomeipHeader),   
     };
 

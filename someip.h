@@ -74,9 +74,9 @@ struct SomeipContext {
     const byte *packet;
     uint32_t len;
     time_t timestamp;
-    struct SomeipHeader *header;
+    SomeipHeader header;
     const byte *payload;
-    struct SomeipSdPayload sdpayload;
+    SomeipSdPayload sdpayload;
 };
 
 // Legal SOME/IP service ids
