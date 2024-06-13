@@ -12,16 +12,23 @@
 #include "lib.h"
 #include "someip.h"
 
-std::array<char, 64> hostname;
-Json::Value root;
+struct Global {
+    std::array<char, 64> hostname;
+    Json::Value root;
 
-bool parse_if_is_someip_packet(struct SomeipContext *ctx) {
+    Global() {
+        // Get hostname for one time
+        gethostname(hostname.data(), hostname.size());
+    }
+} g;
+
+bool parse_if_is_someip_packet(SomeipContext *ctx) {
     // SOME/IP header is at least 16 bytes
-    if (ctx->len < 16)
+    if (ctx->len < sizeof(SomeipHeader))
         return false;
 
     struct SomeipHeader *header = ctx->header;
-    memcpy(header, ctx->packet, sizeof(struct SomeipHeader));
+    memcpy(header, ctx->packet, sizeof(SomeipHeader));
 
     // To host byte order 
     header->service_id = ntohs(header->service_id);
@@ -39,12 +46,14 @@ bool parse_if_is_someip_packet(struct SomeipContext *ctx) {
     
     // Is SOME/IP-SD
     if (header->service_id == 0xffff) {
+        // 8 bytes, so we'll start from here after
         ctx->protocol_type = ProtocolType::SOMEIPSD;
         ctx->sdpayload.flag = ctx->payload[0];
         ctx->sdpayload.entries_array_len = ntohl(*(uint32_t *)(ctx->payload + 4));
-        int entry_length = sizeof(struct SomeipSdEntry);
+
+        int entry_length = sizeof(SomeipSdEntry);
         for (int i = 0; i < ctx->sdpayload.entries_array_len / entry_length; i++) {
-            struct SomeipSdEntry entry;
+            SomeipSdEntry entry;
             memcpy(&entry, ctx->payload + 8 + i * entry_length, entry_length);
             entry.service_id = ntohs(entry.service_id);
             entry.instance_id = ntohs(entry.instance_id);
@@ -62,21 +71,10 @@ bool parse_if_is_someip_packet(struct SomeipContext *ctx) {
     return true;
 }
 
-void format_json_string(const Json::Value &json) {
-    Json::StreamWriterBuilder builder;
-    builder["commentStyle"] = "None";
-    builder["indentation"] = "   ";
-    std::unique_ptr<Json::StreamWriter> writer(builder.newStreamWriter());
-    std::ostringstream os;
-    writer->write(json, &os);
-    std::string json_string = os.str();
-    printf("%s", json_string.c_str());
-}
-
-Json::Value create_someip_json(struct SomeipContext *ctx) {
+Json::Value create_someip_json(SomeipContext *ctx) {
     Json::Value json;
-    struct SomeipHeader *header = ctx->header;
-    json["hostname"] = hostname.data();
+    SomeipHeader *header = ctx->header;
+    json["hostname"] = g.hostname.data();
     json["timestamp"] = ctx->timestamp;
     json["protocol_type"] = int(ctx->protocol_type);
     json["service_id"] = header->service_id;
@@ -90,7 +88,7 @@ Json::Value create_someip_json(struct SomeipContext *ctx) {
     json["return_code"] = header->return_code;
 
     if (ctx->protocol_type == ProtocolType::SOMEIP) {
-        json["payload"] = tohex(ctx->payload, ctx->len - 16);
+        json["payload"] = tohex(ctx->payload, ctx->len - sizeof(SomeipHeader));
     } else if (ctx->protocol_type == ProtocolType::SOMEIPSD) {
         Json::Value json_sdpayload;
         json_sdpayload["flag"] = ctx->sdpayload.flag;
@@ -118,25 +116,25 @@ Json::Value create_someip_json(struct SomeipContext *ctx) {
         json["payload"] = json_sdpayload;
     }
 
-    root.append(json);
+    g.root.append(json);
     return json;
 }
 
 void handle_packet(const byte *packet, uint32_t len, time_t timestamp) {
-    struct SomeipHeader header;
+    SomeipHeader header;
 
     // Remove Ethernet/IP/UDP headers
     int shift = 0x2e;
     packet += shift;
     len -= shift;
 
-    struct SomeipContext ctx = {
+    SomeipContext ctx = {
         .protocol_type = ProtocolType::SOMEIP,
         .packet = packet,
         .len = len,
         .timestamp = timestamp,
         .header = &header,
-        .payload = packet + 16,   
+        .payload = packet + sizeof(SomeipHeader),   
     };
 
     if (!parse_if_is_someip_packet(&ctx)) {
@@ -148,9 +146,6 @@ void handle_packet(const byte *packet, uint32_t len, time_t timestamp) {
 }
 
 int main(int argc, char *argv[]) {
-    // Get hostname for one time
-    gethostname(hostname.data(), hostname.size());
-
     if (argc != 2) {
         fprintf(stderr, "Usage: %s <pcap file>\n", argv[0]);
         return -1;
@@ -177,7 +172,7 @@ int main(int argc, char *argv[]) {
     pcap_close(handle);
 
     // DEBUG
-    format_json_string(root);
+    printf("%s\n", format_json_string(g.root).c_str());
     
     return 0;
 }

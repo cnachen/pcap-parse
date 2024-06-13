@@ -2,3 +2,4 @@
 .venv/
 assets/
 pcap_parse
+*.json

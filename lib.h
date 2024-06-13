@@ -1,6 +1,7 @@
 #ifndef _LIB_H
 #define _LIB_H
 
+#include <jsoncpp/json/json.h>
 #include <string>
 
 using byte = unsigned char;
@@ -19,6 +20,16 @@ static inline std::string tohex(const byte *input, uint32_t len) {
     }
 
     return output;
+}
+
+static inline std::string format_json_string(const Json::Value &json) {
+    Json::StreamWriterBuilder builder;
+    builder["commentStyle"] = "None";
+    builder["indentation"] = "   ";
+    std::unique_ptr<Json::StreamWriter> writer(builder.newStreamWriter());
+    std::ostringstream os;
+    writer->write(json, &os);
+    return os.str();
 }
 
 #endif /* _LIB_H */
