@@ -3,4 +3,9 @@
 - libpcap-dev
 - libjsoncpp-dev
 - libssl-dev
-- libcpp-httplib-dev
+
+## Install dependencies
+sudo apt install build-essential cmake libpcap-dev libjsoncpp-dev libssl-dev
+
+## Build
+make
