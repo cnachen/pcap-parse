@@ -12,15 +12,7 @@
 #include "lib.h"
 #include "someip.h"
 
-struct Global {
-    std::array<char, 64> hostname;
-    Json::Value root;
-
-    Global() {
-        // Get hostname for one time
-        gethostname(hostname.data(), hostname.size());
-    }
-} g;
+Global g;
 
 bool parse_if_is_someip_packet(SomeipContext *ctx) {
     // SOME/IP header is at least 16 bytes
@@ -116,7 +108,6 @@ Json::Value create_someip_json(SomeipContext *ctx) {
         json["payload"] = json_sdpayload;
     }
 
-    g.root.append(json);
     return json;
 }
 
@@ -140,6 +131,7 @@ void handle_packet(const byte *packet, uint32_t len, time_t timestamp) {
     }
 
     Json::Value json = create_someip_json(&ctx);
+    g.root.append(json);
 }
 
 int main(int argc, char *argv[]) {
@@ -160,16 +152,19 @@ int main(int argc, char *argv[]) {
 
     const byte *packet;
     struct pcap_pkthdr header;
-
+    
     // Handle each packet
     while ((packet = pcap_next(handle, &header)) != NULL) {
         handle_packet(packet, header.len, header.ts.tv_sec);
+        post_mongodb(g, g.root);
     }
 
+    // Send remaining packets before cleanup
+    post_mongodb(g, g.root);
     pcap_close(handle);
 
     // DEBUG
-    printf("%s\n", format_json_string(g.root).c_str());
+    // printf("%s\n", format_json_string(g.root).c_str());
     
     return 0;
 }
