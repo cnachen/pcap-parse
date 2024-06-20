@@ -9,7 +9,8 @@
 
 using byte = unsigned char;
 
-static const std::string api_server = "https://yapi.mmtwork.com/mock/607/common/insert-documents/pcap_data";
+static const std::string api_server
+    = "https://yapi.mmtwork.com/mock/607/common/insert-documents/pcap_data";
 static const int max_records = 32;
 
 struct Global {
@@ -70,7 +71,6 @@ static inline void post_mongodb(Global &g, Json::Value &json) {
             printf("Success: %s\n", r.text.c_str());
             break;
         }
-
         printf("Failed(%ld): %s\n", r.status_code, r.error.message.c_str());
     }
 

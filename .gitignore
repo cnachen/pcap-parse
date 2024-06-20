@@ -3,3 +3,4 @@
 assets/
 pcap_parse
 *.json
+build/

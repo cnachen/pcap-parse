@@ -1,4 +1,5 @@
-cmake_minimum_required(VERSION 3.14)  # FetchContent is available in 3.11+, but 3.14+ is recommended.
+# FetchContent is available in 3.11+, but 3.14+ is recommended.
+cmake_minimum_required(VERSION 3.14)
 
 project(PcapParseProject)
 
@@ -9,7 +10,7 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 include(FetchContent)
 FetchContent_Declare(cpr
     GIT_REPOSITORY https://github.com/libcpr/cpr.git
-    GIT_TAG 3b15fa82ea74739b574d705fea44959b58142eb8  # Replace with your desired git commit
+    GIT_TAG 3b15fa82ea74739b574d705fea44959b58142eb8
 )
 
 # Check if cpr has already been populated (previously downloaded and configured)
@@ -30,7 +31,10 @@ if(NOT JSONCPP_FOUND)
 endif()
 
 # Add executable target with source files
-add_executable(pcap_parse pcap_parse.cpp)
+add_executable(pcap_parse src/pcap_parse.cpp)
+
+# Include our headers
+target_include_directories(pcap_parse PRIVATE include)
 
 # Include directories for pcap and jsoncpp for pcap_parse target
 target_include_directories(pcap_parse PRIVATE ${PCAP_INCLUDE_DIRS} ${JSONCPP_INCLUDE_DIRS})
