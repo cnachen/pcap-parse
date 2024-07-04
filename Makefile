@@ -5,3 +5,6 @@ all:
 
 clean:
 	cmake --build build --target clean
+
+install:
+	install -Dm755 build/pcap_parse /bin

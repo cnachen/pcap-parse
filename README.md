@@ -5,7 +5,11 @@
 - libssl-dev
 
 ## Install dependencies
+```
 sudo apt install build-essential cmake libpcap-dev libjsoncpp-dev libssl-dev
+```
 
-## Build
-make
+## Build and run
+```
+make && ./build/pcap_parse <*.pcap>
+```

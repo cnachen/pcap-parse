@@ -1,19 +1,20 @@
 # FetchContent is available in 3.11+, but 3.14+ is recommended.
 cmake_minimum_required(VERSION 3.14)
 
-project(PcapParseProject)
+project(PcapParse)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
 include(FetchContent)
+
+# Check if cpr has already been populated (previously downloaded and configured)
 FetchContent_Declare(cpr
     GIT_REPOSITORY https://github.com/libcpr/cpr.git
     GIT_TAG 3b15fa82ea74739b574d705fea44959b58142eb8
 )
 
-# Check if cpr has already been populated (previously downloaded and configured)
 FetchContent_GetProperties(cpr)
 if(NOT cpr_POPULATED)
     FetchContent_Populate(cpr)
