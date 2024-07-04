@@ -6,11 +6,13 @@
 #include <string>
 #include <algorithm>
 #include <iostream>
+#include <unistd.h>
 
 using byte = unsigned char;
 
 static const std::string api_server
-    = "https://yapi.mmtwork.com/mock/607/common/insert-documents/pcap_data";
+    = "https://dev.common.bip.momenta.works/common/insert-documents/eck_mirror_data_test";
+
 static const int max_records = 32;
 
 struct Global {
@@ -49,6 +51,25 @@ static inline std::string format_json_string(const Json::Value &json) {
     return os.str();
 }
 
+static inline void get_obs_file(const std::string &path) {
+    cpr::Header headers {{"Content-Type", "application/json"}};
+
+    auto get = [&]() {
+        return cpr::Get(
+            cpr::Url {"https://dev.common.bip.momenta.works/common/get-file-url?object_key=" + path},
+            headers
+        );
+    };
+
+    auto r = get();
+
+    printf("%s\n", r.text.c_str());
+}
+
+static inline void list_obs_files(const std::string &path) {
+    return;
+}
+
 static inline void post_mongodb(Global &g, Json::Value &json) {
     if (!json.isArray() || json.size() < max_records)
         return;
@@ -64,14 +85,20 @@ static inline void post_mongodb(Global &g, Json::Value &json) {
     };
 
     int retries = 3;
+    bool success = false;
     while (retries--) {
         auto r = post();
 
         if (r.status_code >= 200 && r.status_code < 300) {
             printf("Success: %s\n", r.text.c_str());
+            success = true;
             break;
         }
         printf("Failed(%ld): %s\n", r.status_code, r.error.message.c_str());
+    }
+
+    if (!success) {
+        // Handle network error
     }
 
     json.clear();

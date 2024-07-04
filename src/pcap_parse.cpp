@@ -135,6 +135,8 @@ void handle_packet(const byte *packet, uint32_t len, time_t timestamp) {
 }
 
 int main(int argc, char *argv[]) {
+    get_obs_file("1234.jpg");
+
     if (argc != 2) {
         fprintf(stderr, "Usage: %s <pcap file>\n", argv[0]);
         return -1;
