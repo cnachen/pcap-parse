@@ -8,16 +8,28 @@
 #include <iostream>
 #include <unistd.h>
 
+#include "utility.h"
+
 using byte = unsigned char;
 
-static const std::string api_server
-    = "https://dev.common.bip.momenta.works/common/insert-documents/eck_mirror_data_test";
-
 static const int max_records = 32;
+
+class Api {
+private:
+    const std::string api_server;
+public:
+    Api(const std::string api_server = "https://dev.common.bip.momenta.works") : api_server(api_server) {}
+    std::string get_obs_file_url(const std::string &path);
+    std::string list_obs_files(const std::string &hostname, int page, int pagesize = 10);
+    std::string list_obs_hostnames(int page, int pagesize = 10);
+    void post_mongodb(Json::Value &json);
+};
 
 struct Global {
     std::array<char, 64> hostname;
     Json::Value root;
+    LockedQueue<std::string> filenames;
+    LockedQueue<Json::Value> jsons;
 
     Global() {
         // Get hostname for one time
@@ -49,59 +61,6 @@ static inline std::string format_json_string(const Json::Value &json) {
     std::ostringstream os;
     writer->write(json, &os);
     return os.str();
-}
-
-static inline void get_obs_file(const std::string &path) {
-    cpr::Header headers {{"Content-Type", "application/json"}};
-
-    auto get = [&]() {
-        return cpr::Get(
-            cpr::Url {"https://dev.common.bip.momenta.works/common/get-file-url?object_key=" + path},
-            headers
-        );
-    };
-
-    auto r = get();
-
-    printf("%s\n", r.text.c_str());
-}
-
-static inline void list_obs_files(const std::string &path) {
-    return;
-}
-
-static inline void post_mongodb(Global &g, Json::Value &json) {
-    if (!json.isArray() || json.size() < max_records)
-        return;
-
-    cpr::Header headers {{"Content-Type", "application/json"}};
-
-    auto post = [&]() {
-        return cpr::Post(
-            cpr::Url {api_server},
-            cpr::Body {format_json_string(json).c_str()},
-            headers
-        );
-    };
-
-    int retries = 3;
-    bool success = false;
-    while (retries--) {
-        auto r = post();
-
-        if (r.status_code >= 200 && r.status_code < 300) {
-            printf("Success: %s\n", r.text.c_str());
-            success = true;
-            break;
-        }
-        printf("Failed(%ld): %s\n", r.status_code, r.error.message.c_str());
-    }
-
-    if (!success) {
-        // Handle network error
-    }
-
-    json.clear();
 }
 
 #endif /* _LIB_H */

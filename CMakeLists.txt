@@ -1,7 +1,7 @@
 # FetchContent is available in 3.11+, but 3.14+ is recommended.
 cmake_minimum_required(VERSION 3.14)
 
-project(PcapParse)
+project(BipEck)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -32,16 +32,23 @@ if(NOT JSONCPP_FOUND)
 endif()
 
 # Add executable target with source files
-add_executable(pcap_parse src/pcap_parse.cpp)
+add_executable(bip-eck src/bip_eck.cpp
+                       src/workers/obs_observer.cpp
+                       src/workers/pcap_parser.cpp
+                       src/workers/worker.cpp
+                       src/handlers/packet_handler.cpp
+                       src/handlers/protocol_handler.cpp
+                       src/handlers/someip_protocol_handler.cpp
+                       src/api.cpp)
 
 # Include our headers
-target_include_directories(pcap_parse PRIVATE include)
+target_include_directories(bip-eck PRIVATE include)
 
-# Include directories for pcap and jsoncpp for pcap_parse target
-target_include_directories(pcap_parse PRIVATE ${PCAP_INCLUDE_DIRS} ${JSONCPP_INCLUDE_DIRS})
+# Include directories for pcap and jsoncpp for bip-eck target
+target_include_directories(bip-eck PRIVATE ${PCAP_INCLUDE_DIRS} ${JSONCPP_INCLUDE_DIRS})
 
-# Link libraries to pcap_parse target
-target_link_libraries(pcap_parse PRIVATE
+# Link libraries to bip-eck target
+target_link_libraries(bip-eck PRIVATE
     ${PCAP_LIBRARIES}
     ${JSONCPP_LIBRARIES}
     cpr::cpr
@@ -51,13 +58,13 @@ target_link_libraries(pcap_parse PRIVATE
 
 # Instruct CMake to use pkg-config to set the include path for the target
 if(PCAP_FOUND)
-    target_include_directories(pcap_parse PRIVATE ${PCAP_INCLUDE_DIRS})
-    target_link_directories(pcap_parse PRIVATE ${PCAP_LIBRARY_DIRS})
-    target_compile_options(pcap_parse PRIVATE ${PCAP_CFLAGS_OTHER})
+    target_include_directories(bip-eck PRIVATE ${PCAP_INCLUDE_DIRS})
+    target_link_directories(bip-eck PRIVATE ${PCAP_LIBRARY_DIRS})
+    target_compile_options(bip-eck PRIVATE ${PCAP_CFLAGS_OTHER})
 endif()
 
 if(JSONCPP_FOUND)
-    target_include_directories(pcap_parse PRIVATE ${JSONCPP_INCLUDE_DIRS})
-    target_link_directories(pcap_parse PRIVATE ${JSONCPP_LIBRARY_DIRS})
-    target_compile_options(pcap_parse PRIVATE ${JSONCPP_CFLAGS_OTHER})
+    target_include_directories(bip-eck PRIVATE ${JSONCPP_INCLUDE_DIRS})
+    target_link_directories(bip-eck PRIVATE ${JSONCPP_LIBRARY_DIRS})
+    target_compile_options(bip-eck PRIVATE ${JSONCPP_CFLAGS_OTHER})
 endif()
