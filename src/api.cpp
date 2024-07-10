@@ -42,14 +42,11 @@ std::string Api::list_obs_hostnames(int page, int pagesize) {
 }
 
 void Api::post_mongodb(Json::Value &json) {
-    if (!json.isArray() || json.size() < max_records)
-        return;
-
     cpr::Header headers {{"Content-Type", "application/json"}};
 
     auto post = [&]() {
         return cpr::Post(
-            cpr::Url {api_server},
+            cpr::Url {api_server + "/common/insert-documents/eck_mirror_data_test"},
             cpr::Body {format_json_string(json).c_str()},
             headers
         );

@@ -8,7 +8,7 @@ ENV TZ=Asia/Shanghai \
 
 RUN apt-get update && apt-get upgrade
 RUN apt-get install -y build-essential cmake ninja-build pkg-config git neovim tmux
-RUN apt-get install -y libpcap-dev libjsoncpp-dev libssl-dev
+RUN apt-get install -y libpcap-dev libjsoncpp-dev libssl-dev libarchive-dev
 
 RUN apt-get install -y tzdata
 RUN ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime

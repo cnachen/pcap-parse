@@ -17,14 +17,15 @@ bool SomeipProtocolHandler::is_this_protocol() {
 
     if (header->protocol_version != 0x1)
         return false;
-    
+
     return true;
 }
 
 void SomeipProtocolHandler::handle() {
     to_json();
-
-    printf("%s\n", format_json_string(json).c_str());
+    Json::Value tmp;
+    tmp.append(json);
+    g.jsons.push(tmp);
 }
 
 void SomeipProtocolHandler::fill(const byte *packet, uint32_t len, time_t timestamp) {

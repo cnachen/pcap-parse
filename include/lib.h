@@ -6,13 +6,12 @@
 #include <string>
 #include <algorithm>
 #include <iostream>
+#include <random>
 #include <unistd.h>
 
 #include "utility.h"
 
 using byte = unsigned char;
-
-static const int max_records = 32;
 
 class Api {
 private:
@@ -28,7 +27,6 @@ public:
 struct Global {
     std::array<char, 64> hostname;
     Json::Value root;
-    LockedQueue<std::string> filenames;
     LockedQueue<Json::Value> jsons;
 
     Global() {
@@ -51,6 +49,44 @@ static inline std::string tohex(const byte *input, uint32_t len) {
     }
 
     return output;
+}
+
+static inline std::string generate_uuid() {
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_int_distribution<> dis(0, 15);
+    std::uniform_int_distribution<> dis2(8, 11);
+
+    std::stringstream ss;
+    ss << std::hex;
+
+    for (int i = 0; i < 8; i++) {
+        ss << dis(gen);
+    }
+    ss << "-";
+
+    for (int i = 0; i < 4; i++) {
+        ss << dis(gen);
+    }
+    ss << "-4";
+
+    for (int i = 0; i < 3; i++) {
+        ss << dis(gen);
+    }
+    ss << "-";
+
+    ss << dis2(gen);
+
+    for (int i = 0; i < 3; i++) {
+        ss << dis(gen);
+    }
+    ss << "-";
+
+    for (int i = 0; i < 12; i++) {
+        ss << dis(gen);
+    }
+
+    return ss.str();
 }
 
 static inline std::string format_json_string(const Json::Value &json) {

@@ -11,6 +11,7 @@ private:
     SomeipContext context;
     SomeipHeader *header;
     Json::Value json;
+    int chunk_size = 256;
 public:
     bool is_this_protocol() override;
     void handle() override;

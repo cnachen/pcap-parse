@@ -25,6 +25,10 @@ endif()
 find_package(PkgConfig REQUIRED)
 pkg_search_module(PCAP REQUIRED libpcap)
 
+# Find the required libarchive package using pkg-config
+find_package(PkgConfig REQUIRED)
+pkg_search_module(ARCHIVE REQUIRED libarchive)
+
 # Find jsoncpp package using pkg-config, or fallback to find_package
 pkg_search_module(JSONCPP jsoncpp)
 if(NOT JSONCPP_FOUND)
@@ -33,6 +37,7 @@ endif()
 
 # Add executable target with source files
 add_executable(bip-eck src/bip_eck.cpp
+                       src/workers/mongodb_uploader.cpp
                        src/workers/obs_observer.cpp
                        src/workers/pcap_parser.cpp
                        src/workers/worker.cpp
@@ -45,12 +50,15 @@ add_executable(bip-eck src/bip_eck.cpp
 target_include_directories(bip-eck PRIVATE include)
 
 # Include directories for pcap and jsoncpp for bip-eck target
-target_include_directories(bip-eck PRIVATE ${PCAP_INCLUDE_DIRS} ${JSONCPP_INCLUDE_DIRS})
+target_include_directories(bip-eck PRIVATE ${PCAP_INCLUDE_DIRS}
+                                           ${JSONCPP_INCLUDE_DIRS}
+                                           ${ARCHIVE_INCLUDE_DIRS})
 
 # Link libraries to bip-eck target
 target_link_libraries(bip-eck PRIVATE
     ${PCAP_LIBRARIES}
     ${JSONCPP_LIBRARIES}
+    ${ARCHIVE_LIBRARIES}
     cpr::cpr
     ssl
     crypto
@@ -67,4 +75,10 @@ if(JSONCPP_FOUND)
     target_include_directories(bip-eck PRIVATE ${JSONCPP_INCLUDE_DIRS})
     target_link_directories(bip-eck PRIVATE ${JSONCPP_LIBRARY_DIRS})
     target_compile_options(bip-eck PRIVATE ${JSONCPP_CFLAGS_OTHER})
+endif()
+
+if(ARCHIVE_FOUND)
+    target_include_directories(bip-eck PRIVATE ${ARCHIVE_INCLUDE_DIRS})
+    target_link_directories(bip-eck PRIVATE ${ARCHIVE_LIBRARY_DIRS})
+    target_compile_options(bip-eck PRIVATE ${ARCHIVE_CFLAGS_OTHER})
 endif()

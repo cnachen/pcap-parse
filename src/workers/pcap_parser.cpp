@@ -13,6 +13,20 @@
 #include "someip.h"
 #include "lib.h"
 
+using namespace std::literals::chrono_literals;
+
+void PcapParser::work() {
+    while (running) {
+        auto [not_default, filename] = locked_queue->pop_default();
+        if (not_default) {
+            printf("Parsing file: %s\n", filename.c_str());
+            parse(filename);
+            printf("File parsed: %s\n", filename.c_str());
+        }
+        std::this_thread::sleep_for(1s);
+    }
+}
+
 int PcapParser::parse(const std::string &filename) {
     char errbuf[PCAP_ERRBUF_SIZE];
     pcap_t *handle;

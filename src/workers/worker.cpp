@@ -6,10 +6,12 @@
 Worker::~Worker() {
     stop();
 }
+
 void Worker::start() {
     running = true;
     worker_thread = std::thread(&Worker::work, this);
 }
+
 void Worker::stop() {
     running = false;
     if (worker_thread.joinable()) {
