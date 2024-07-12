@@ -8,6 +8,7 @@ class MongodbUploader : public Worker {
 private:
     Api api;
     int multiplier = 1;
+    int chunk_size = 8192;
 protected:
     void work() override;
 public:

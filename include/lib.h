@@ -26,7 +26,6 @@ public:
 
 struct Global {
     std::array<char, 64> hostname;
-    Json::Value root;
     LockedQueue<Json::Value> jsons;
 
     Global() {

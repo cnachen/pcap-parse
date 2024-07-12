@@ -1,0 +1,28 @@
+trigger:
+  tags:
+    include:
+      - "v*"
+    exclude: []
+
+stages:
+  - stage: BuildAndUpload
+    displayName: "Build and Upload Stage"
+    jobs:
+      - job: BuildAndUpload
+        pool: default
+        steps:
+          - checkout: self
+            path: src/
+          - script: docker build -f Dockerfile -t artifactory.momenta.works/docker-pl/bip_eck:$(Build.BuildId) .
+            displayName: "Building Docker image $(Build.BuildId)"
+          - script: docker build -f Dockerfile -t artifactory.momenta.works/docker-pl/bip_eck:latest .
+            displayName: "Building Docker image latest"
+          - task: Docker@2
+            displayName: "Push Docker image to Artifactory"
+            inputs:
+              containerRegistry: "Artifactory"
+              repository: "docker-pl/bip_eck"
+              command: "push"
+              tags: |
+                $(Build.BuildId)
+                latest

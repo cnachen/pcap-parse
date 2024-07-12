@@ -54,7 +54,10 @@ void ObsObserver::work() {
             printf("Extracting: %s\n", local_path.c_str());
             auto pcap = extract_file(local_path, "/tmp/" + remote_file.hostname);
             printf("Extracted: %s\n", pcap.c_str());
-            locked_queue->push(pcap);
+            locked_queue->push(LocalFile {
+                .hostname = remote_file.hostname,
+                .path = pcap,
+            });
         }
 
         std::this_thread::sleep_for(1s);

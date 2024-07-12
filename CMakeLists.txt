@@ -40,6 +40,7 @@ add_executable(bip-eck src/bip_eck.cpp
                        src/workers/mongodb_uploader.cpp
                        src/workers/obs_observer.cpp
                        src/workers/pcap_parser.cpp
+                       src/workers/task_dispatcher.cpp
                        src/workers/worker.cpp
                        src/handlers/packet_handler.cpp
                        src/handlers/protocol_handler.cpp

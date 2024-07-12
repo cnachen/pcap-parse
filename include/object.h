@@ -2,6 +2,7 @@
 #define _OBJECT_H
 
 #include "workers/pcap_parser.h"
+#include "workers/task_dispatcher.h"
 #include "handlers/packet_handler.h"
 #include "handlers/protocol_handler.h"
 #include "handlers/someip_protocol_handler.h"

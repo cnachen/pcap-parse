@@ -19,5 +19,6 @@ RUN rm -rf /var/lib/apt/lists/*
 COPY ./ /work/buildroot
 
 RUN make -C /work/buildroot && make -C /work/buildroot install
+RUN cp /work/buildroot/config.json /work
 
-CMD ["/bin/bip-eck"]
+CMD ["bip-eck"]

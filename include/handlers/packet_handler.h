@@ -9,7 +9,7 @@ class PacketHandler {
 private:
     std::unordered_set<ProtocolHandler *> protocol_handlers;
 public:
-    void handle(const byte *packet, uint32_t len, time_t timestamp);
+    void handle(const byte *packet, uint32_t len, double timestamp, std::string hostname);
     void add_handler(ProtocolHandler *protocol_handler);
 };
 

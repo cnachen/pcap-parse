@@ -73,7 +73,7 @@ struct SomeipContext {
     ProtocolType protocol_type;
     const byte *packet;
     uint32_t len;
-    time_t timestamp;
+    double timestamp;
     SomeipHeader header;
     const byte *payload;
     SomeipSdPayload sdpayload;

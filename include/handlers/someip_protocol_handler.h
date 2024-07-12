@@ -15,7 +15,7 @@ private:
 public:
     bool is_this_protocol() override;
     void handle() override;
-    void fill(const byte *packet, uint32_t len, time_t timestamp) override;
+    void fill(const byte *packet, uint32_t len, double timestamp, std::string hostname) override;
     void to_json();
 };
 

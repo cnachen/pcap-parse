@@ -23,13 +23,11 @@ bool SomeipProtocolHandler::is_this_protocol() {
 
 void SomeipProtocolHandler::handle() {
     to_json();
-    Json::Value tmp;
-    tmp.append(json);
-    g.jsons.push(tmp);
+    g.jsons.push(json);
 }
 
-void SomeipProtocolHandler::fill(const byte *packet, uint32_t len, time_t timestamp) {
-    this->ProtocolHandler::fill(packet, len, timestamp);
+void SomeipProtocolHandler::fill(const byte *packet, uint32_t len, double timestamp, std::string hostname) {
+    this->ProtocolHandler::fill(packet, len, timestamp, hostname);
 
     this->context = {
         .protocol_type = ProtocolType::SOMEIP,
@@ -78,7 +76,7 @@ void SomeipProtocolHandler::fill(const byte *packet, uint32_t len, time_t timest
 
 void SomeipProtocolHandler::to_json() {
     json.clear();
-    json["hostname"] = g.hostname.data();
+    json["hostname"] = this->hostname;
     json["timestamp"] = this->context.timestamp;
     json["protocol_type"] = int(this->context.protocol_type);
     json["service_id"] = header->service_id;

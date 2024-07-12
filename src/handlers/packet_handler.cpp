@@ -1,7 +1,7 @@
 #include "object.h"
 #include "someip.h"
 
-void PacketHandler::handle(const byte *packet, uint32_t len, time_t timestamp) {
+void PacketHandler::handle(const byte *packet, uint32_t len, double timestamp, std::string hostname) {
     // Remove Ethernet/IP/UDP headers
     int shift = 0x2e;
     packet += shift;
@@ -9,7 +9,7 @@ void PacketHandler::handle(const byte *packet, uint32_t len, time_t timestamp) {
 
     bool processed = false;
     for (auto protocol_handler : protocol_handlers) {
-        protocol_handler->fill(packet, len, timestamp);
+        protocol_handler->fill(packet, len, timestamp, hostname);
         if (protocol_handler->is_this_protocol()) {
             protocol_handler->handle();
             processed = true;

@@ -7,6 +7,11 @@
 #include "workers/worker.h"
 #include "lib.h"
 
+struct LocalFile {
+    std::string hostname;
+    std::string path;
+};
+
 struct RemoteFile {
     std::string hostname;
     std::string url;
@@ -15,8 +20,8 @@ struct RemoteFile {
 
 class ObsObserver : public Worker {
 private:
-    LockedQueue<std::string> *locked_queue;
     Api api;
+    LockedQueue<LocalFile> *locked_queue;
     std::vector<std::string> hostnames;
     std::queue<RemoteFile> remote_files;
     int loop_count = 99;
@@ -25,7 +30,7 @@ private:
 protected:
     void work() override;
 public:
-    ObsObserver(LockedQueue<std::string> *locked_queue)
+    ObsObserver(LockedQueue<LocalFile> *locked_queue)
         : locked_queue(locked_queue) {
             // hostnames.push_back("LC6-EDY0038");
             hostnames.push_back("Test");

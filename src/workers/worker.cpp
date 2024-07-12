@@ -1,5 +1,5 @@
 #include <chrono>
-#include <iostream>
+#include <cstdio>
 
 #include "workers/worker.h"
 
@@ -21,7 +21,7 @@ void Worker::stop() {
 
 void Worker::work() {
     while (running) {
-        std::cout << "Working..." << std::endl;
+        std::printf("Default working...\n");
         std::this_thread::sleep_for(std::chrono::seconds(1));
     }
 }

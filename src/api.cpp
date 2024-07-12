@@ -58,7 +58,8 @@ void Api::post_mongodb(Json::Value &json) {
         auto r = post();
 
         if (r.status_code >= 200 && r.status_code < 300) {
-            printf("Success: %s\n", r.text.c_str());
+            // printf("Success: %s\n", r.text.c_str());
+            printf("Have %d entries sent\n", json.size());
             success = true;
             break;
         }
